@@ -19,7 +19,8 @@ def main():
     print("Hello from ai-agent!")
 
     try:
-        print("prompt:",sys.argv[1])
+        inquiry = sys.argv[1]
+        #print("prompt:",sys.argv[1])
     except Exception as e:
         print("error:",e)
         SystemExit(1)
@@ -27,13 +28,12 @@ def main():
     else:
 
         messages = [
-             types.Content(role="user", parts=[types.Part(text=sys.argv[1])]),
+             types.Content(role="user", parts=[types.Part(text=inquiry)]),
             ]
-        
+        response=ai_function(sys.argv[1],messages)
 
-
-
-        ai_function(sys.argv[1],messages)
+        if '-v' in sys.argv or '--verbose' in sys.argv:
+            ai_follow_up(response,inquiry)
     
 
 def ai_function(string,messages):
@@ -42,9 +42,14 @@ def ai_function(string,messages):
     model='gemini-2.0-flash-001', contents=messages
         )
     print(response.text)
+    return response
+
+def ai_follow_up(response,inquiry):
+
+    print("User prompt:",inquiry)
     print("Prompt tokens:",response.usage_metadata.prompt_token_count)
     print("Response tokens:",response.usage_metadata.candidates_token_count)
-    #return response
+
 
 
 if __name__ == "__main__":

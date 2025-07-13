@@ -27,7 +27,7 @@ def get_file_content(working_directory, file_path):
         return f"Error: {e}"
 
 
-dir_target="lorem.txt"
-dir_base="calculator"
+#dir_target="lorem.txt"
+#dir_base="calculator"
 
-print(get_file_content(dir_base, dir_target))
+#print(get_file_content(dir_base, dir_target))

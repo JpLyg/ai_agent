@@ -1,8 +1,11 @@
 import os
+from .run_python import *
 #import config 
 #from functions.get_files_info import get_files_info
+MAX_CHARS = 10000
 
-def get_files_info(working_directory, directory=None):
+
+def get_files_info(working_directory = ".", directory=None):
     
     if directory is None or directory == ".": 
         directory = "."
@@ -37,7 +40,7 @@ def get_files_info(working_directory, directory=None):
     
     return ""
    
-def get_file_content(working_directory, file_path):
+def get_file_content(working_directory = ".", file_path="."):
 
     try:
         target_file = os.path.abspath(os.path.join(working_directory,file_path))
@@ -52,17 +55,19 @@ def get_file_content(working_directory, file_path):
                 return f"Error: File not found or is not a regular file: \"{file_path}\""
         
         with open(target_file, "r") as f:
-            file_content_string = f.read(config.MAX_CHARS)
+            file_content_string = f.read(MAX_CHARS)
             #print("test file:",file_content_string)
         
-        if len(file_content_string) == config.MAX_CHARS: file_content_string += f"[...File \"{file_path}\" truncated at 10000 characters]"
+        if len(file_content_string) == MAX_CHARS: file_content_string += f"[...File \"{file_path}\" truncated at 10000 characters]"
 
         return file_content_string
     
     except Exception as e:
         return f"Error: {e}"
 
-def write_file(working_directory, file_path, content=None): 
+def write_file(working_directory= ".", file_path= ".", content=None): 
+
+    
     try:
 
 
@@ -82,9 +87,15 @@ def write_file(working_directory, file_path, content=None):
         with open(target_file, "w") as f:
              f.write(content)
 
-        return f'Successfully wrote to "{file_path}" ({len(content)} characters written)'
+        return f'Successfully wrote to "{file_path}" ({len(content)} characters written.)'
 
 
     except Exception as e:
         return f"Error: {e}"
 
+function_list = {
+    "get_files_info": get_files_info,
+    "get_file_content": get_file_content,
+    "run_python_file": run_python_file,
+    "write_file": write_file,
+}

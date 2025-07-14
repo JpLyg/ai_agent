@@ -46,18 +46,31 @@ def main():
         SystemExit(1)
         sys.exit(1)
     else:
-
         messages = [
-             types.Content(role="user", parts=[types.Part(text=inquiry)]),
-            ]
-        
-        response=ai_function(sys.argv[1],messages,model_name,system_prompt,available_functions,verbose)
+        types.Content(role="user", parts=[types.Part(text=inquiry)]),
+        ]
+        try:
 
+            for i in range(20):
+                response,process_call=ai_function(sys.argv[1],messages,model_name,system_prompt,available_functions,verbose)
+                messages.append(response.candidates[0].content)
 
-            #ai_follow_up(response,inquiry)
+                if not isinstance(process_call, str): 
+                    print("valid for next iteration")
+                    messages.append(
+                        types.Content(role="tool",parts=process_call.parts)
+                    )
+                else:
+                    #print(process_call)
+                    break
+                print("curent iteration:",i,"***********************\n")
+        except Exception as e:
+            print("error:",e)
+            SystemExit(1)
+            sys.exit(1)
     
 def ai_function(string,messages,model_name,system_prompt,available_functions,verbose):
-
+    procesed_call = None
     response = client.models.generate_content(
         model=model_name,
         contents=messages,
@@ -67,19 +80,14 @@ def ai_function(string,messages,model_name,system_prompt,available_functions,ver
 )
     if response.function_calls: 
         procesed_call = call_function (response.function_calls[0],verbose)
-
         print(f"-> {procesed_call.parts[0].function_response.response}")
 
-    else: print(response.text)
+    else: 
+        print(response.text)
+        procesed_call = response.text
 
     #call_function(response.function_calls[0],True)
-    #return response
-
-def ai_follow_up(response,inquiry):
-    print("User prompt:",inquiry)
-    print("Prompt tokens:",response.usage_metadata.prompt_token_count)
-    print("Response tokens:",response.usage_metadata.candidates_token_count)
-
+    return response, procesed_call
 
 def call_function(function_call_part, verbose=False):
     func_to_use = function_call_part.args.copy()
@@ -119,6 +127,10 @@ def call_function(function_call_part, verbose=False):
 
 
 
+def ai_follow_up(response,inquiry):
+    print("User prompt:",inquiry)
+    print("Prompt tokens:",response.usage_metadata.prompt_token_count)
+    print("Response tokens:",response.usage_metadata.candidates_token_count)
 
 
 

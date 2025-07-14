@@ -38,21 +38,24 @@ def main():
     )
 
     print("Hello from ai-agent!")
-
     try:
         inquiry = sys.argv[1]
     except Exception as e:
-        print("error:",e)
-        SystemExit(1)
-        sys.exit(1)
-    else:
+        
+        print("No system arguments, proceeding to manual")
+        inquiry =input("How may I help?: ")
+        #SystemExit(1)
+        #sys.exit(1)
+    finally:
+
         messages = [
         types.Content(role="user", parts=[types.Part(text=inquiry)]),
         ]
+
         try:
 
             for i in range(20):
-                response,process_call=ai_function(sys.argv[1],messages,model_name,system_prompt,available_functions,verbose)
+                response,process_call=ai_function(inquiry,messages,model_name,system_prompt,available_functions,verbose)
                 messages.append(response.candidates[0].content)
 
                 if not isinstance(process_call, str): 
@@ -62,7 +65,12 @@ def main():
                     )
                 else:
                     #print(process_call)
-                    break
+                    new_inquiry =input("response: ")
+                    if new_inquiry.upper() == "BREAK": break
+                    messages.append(
+                        types.Content(role="user",parts=[types.Part(text=new_inquiry)])
+                    )
+
                 print("curent iteration:",i,"***********************\n")
         except Exception as e:
             print("error:",e)
